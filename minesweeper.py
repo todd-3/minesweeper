@@ -1,5 +1,6 @@
 import pygame
 from generate_layout import new_layout
+from sprites import Pointer
 
 BOARD_SIZE = 15, 15
 MINE_COUNT = 30
@@ -17,27 +18,41 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode(screen_size)
     pygame.display.set_caption("MINESWEEPER")
     pygame.display.set_icon(pygame.image.load("assets/window_icon.png").convert())
+    pygame.mouse.set_visible(False)
     clock = pygame.time.Clock()
+
+    # set pointer class
+    cursor = Pointer(
+        shovel_art=pygame.image.load("assets/shovel.png"),
+        flag_art=pygame.image.load("assets/flag.png"),
+        size=(20,20)
+    )
+    pointer_group = pygame.sprite.Group(cursor)
 
     # load cell art
     cell_assets = [pygame.image.load("assets/" + file).convert() for file in ART]
 
-    # display field
-    screen.fill("white")
-
-    base_rec = pygame.Rect(25, 125, *ART_SIZE)
-    for y, row in enumerate(board_layout):
-        for x, cell_info in enumerate(row):
-            screen.blit(cell_assets[cell_info], base_rec.move(x * ART_SIZE[0], y * ART_SIZE[1]))
-
-    pygame.display.flip()
-
     running = True
     while running:
-        clock.tick(10)
+        clock.tick(30)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                cursor.update_state()
+
+        # display field
+        screen.fill("white")
+
+        base_rec = pygame.Rect(25, 125, *ART_SIZE)
+        for y, row in enumerate(board_layout):
+            for x, cell_info in enumerate(row):
+                screen.blit(cell_assets[cell_info], base_rec.move(x * ART_SIZE[0], y * ART_SIZE[1]))
+
+        pointer_group.update()
+        pointer_group.draw(screen)
+
+        pygame.display.flip()
 
     pygame.quit()
