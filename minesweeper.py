@@ -16,7 +16,7 @@ if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode(screen_size)
     pygame.display.set_caption("MINESWEEPER")
-    pygame.display.set_icon(pygame.image.load("assets/cell_mine.png").convert())
+    pygame.display.set_icon(pygame.image.load("assets/window_icon.png").convert())
     clock = pygame.time.Clock()
 
     # load cell art
