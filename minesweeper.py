@@ -16,10 +16,11 @@ if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode(screen_size)
     pygame.display.set_caption("MINESWEEPER")
+    pygame.display.set_icon(pygame.image.load("assets/cell_mine.png").convert())
     clock = pygame.time.Clock()
 
     # load cell art
-    assets = [pygame.image.load("assets/" + file).convert() for file in ART]
+    cell_assets = [pygame.image.load("assets/" + file).convert() for file in ART]
 
     # display field
     screen.fill("white")
@@ -27,13 +28,13 @@ if __name__ == "__main__":
     base_rec = pygame.Rect(25, 125, *ART_SIZE)
     for y, row in enumerate(board_layout):
         for x, cell_info in enumerate(row):
-            screen.blit(assets[cell_info], base_rec.move(x * ART_SIZE[0], y * ART_SIZE[1]))
+            screen.blit(cell_assets[cell_info], base_rec.move(x * ART_SIZE[0], y * ART_SIZE[1]))
 
     pygame.display.flip()
 
     running = True
     while running:
-        clock.tick(20)
+        clock.tick(10)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
