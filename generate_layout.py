@@ -32,56 +32,25 @@ def new_layout(board_width: int, board_height, mine_count: int) -> list[list[int
             if cell == 9:  # don't check if cell is a mine
                 continue
 
-            surrounded_count = 0
             if x == 0 and y == 0:  # top left corner
-                surrounded_count += gameboard[y][x + 1] == 9
-                surrounded_count += gameboard[y + 1][x] == 9
-                surrounded_count += gameboard[y + 1][x + 1] == 9
+                surroundings = [(0, 1), (1, 0), (1, 1)]
             elif x == 0 and 0 < y < height:  # left edge
-                surrounded_count += gameboard[y - 1][x] == 9
-                surrounded_count += gameboard[y - 1][x + 1] == 9
-                surrounded_count += gameboard[y][x + 1] == 9
-                surrounded_count += gameboard[y + 1][x] == 9
-                surrounded_count += gameboard[y + 1][x + 1] == 9
+                surroundings = [(-1, 0), (-1, 1), (0, 1), (1, 0), (1, 1)]
             elif x == 0 and y == height:  # bottom left corner
-                surrounded_count += gameboard[y - 1][x] == 9
-                surrounded_count += gameboard[y - 1][x + 1] == 9
-                surrounded_count += gameboard[y][x + 1] == 9
+                surroundings = [(-1, 0), (-1, 1), (0, 1)]
             elif 0 < x < width and y == height:  # bottom edge
-                surrounded_count += gameboard[y - 1][x - 1] == 9
-                surrounded_count += gameboard[y - 1][x] == 9
-                surrounded_count += gameboard[y - 1][x + 1] == 9
-                surrounded_count += gameboard[y][x - 1] == 9
-                surrounded_count += gameboard[y][x + 1] == 9
+                surroundings = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1)]
             elif x == width and y == height:  # bottom right corner
-                surrounded_count += gameboard[y - 1][x - 1] == 9
-                surrounded_count += gameboard[y - 1][x] == 9
-                surrounded_count += gameboard[y][x - 1] == 9
+                surroundings = [(-1, -1), (-1, 0), (0, -1)]
             elif x == width and 0 < y < height:  # right edge
-                surrounded_count += gameboard[y - 1][x - 1] == 9
-                surrounded_count += gameboard[y - 1][x] == 9
-                surrounded_count += gameboard[y][x - 1] == 9
-                surrounded_count += gameboard[y + 1][x - 1] == 9
-                surrounded_count += gameboard[y + 1][x] == 9
+                surroundings = [(-1, -1), (-1, 0), (0, -1), (1, -1), (1, 0)]
             elif x == width and y == 0:  # top right corner
-                surrounded_count += gameboard[y][x - 1] == 9
-                surrounded_count += gameboard[y + 1][x - 1] == 9
-                surrounded_count += gameboard[y + 1][x] == 9
+                surroundings = [(0, -1), (1, -1), (1, 0)]
             elif 0 < x < width and y == 0:  # top edge
-                surrounded_count += gameboard[y][x - 1] == 9
-                surrounded_count += gameboard[y][x + 1] == 9
-                surrounded_count += gameboard[y + 1][x - 1] == 9
-                surrounded_count += gameboard[y + 1][x] == 9
-                surrounded_count += gameboard[y + 1][x + 1] == 9
+                surroundings = [(0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
             else:
-                surrounded_count += gameboard[y - 1][x - 1] == 9
-                surrounded_count += gameboard[y - 1][x] == 9
-                surrounded_count += gameboard[y - 1][x + 1] == 9
-                surrounded_count += gameboard[y][x - 1] == 9
-                surrounded_count += gameboard[y][x + 1] == 9
-                surrounded_count += gameboard[y + 1][x - 1] == 9
-                surrounded_count += gameboard[y + 1][x] == 9
-                surrounded_count += gameboard[y + 1][x + 1] == 9
+                surroundings = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+            surrounded_count = sum(gameboard[y + offy][x + offx] == 9 for offy, offx in surroundings)
 
             gameboard[y][x] = surrounded_count
     return gameboard
