@@ -18,6 +18,7 @@ if __name__ == "__main__":
     pygame.mouse.set_visible(False)
     clock = pygame.time.Clock()
     cell_size = (30, 30)
+    flag_size = (20, 20)
 
     # load art
     primary_cell_art = ["cell_0.png", "cell_1.png", "cell_2.png", "cell_3.png", "cell_4.png", "cell_5.png", "cell_6.png", "cell_7.png", "cell_8.png", "cell_mine.png"]
@@ -25,6 +26,10 @@ if __name__ == "__main__":
     flag = pygame.image.load("assets/flag.png")
     shovel = pygame.image.load("assets/shovel.png")
     cover_cell = pygame.image.load("assets/cell_covered.png")
+
+    # build rest of assets
+    flagged_cell = pygame.image.load("assets/cell_covered.png")
+    flagged_cell.blit(flag, pygame.Rect(6, 6, *flag_size))
 
     # set pointer class
     cursor = Pointer(
@@ -50,7 +55,7 @@ if __name__ == "__main__":
         base_rec = pygame.Rect(25, 125, *cell_size)
         for y, row in enumerate(board_layout):
             for x, cell_info in enumerate(row):
-                screen.blit(cell_assets[cell_info], base_rec.move(x * cell_size[0], y * cell_size[1]))
+                screen.blit(flagged_cell, base_rec.move(x * cell_size[0], y * cell_size[1]))
 
         pointer_group.update()
         pointer_group.draw(screen)
