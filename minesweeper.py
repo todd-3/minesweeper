@@ -1,14 +1,16 @@
 import pygame
 from generate_layout import new_layout
 from sprites import Pointer
+from random import seed
 
+seed(10)
 BOARD_SIZE = 15, 15
 MINE_COUNT = 30
 screen_size = (500, 600)
 
 if __name__ == "__main__":
     board_layout = new_layout(*BOARD_SIZE, MINE_COUNT)  # lay new mines
-    print(*[' '.join([str(item) for item in row]) for row in board_layout], sep='\n')  # Prints board list - I know it's a mess
+    print(*[' '.join([str(item[0]) for item in row]) for row in board_layout], sep='\n')  # Prints board list - I know it's a mess
 
     # set up window
     pygame.init()
@@ -55,7 +57,7 @@ if __name__ == "__main__":
         base_rec = pygame.Rect(25, 125, *cell_size)
         for y, row in enumerate(board_layout):
             for x, cell_info in enumerate(row):
-                screen.blit(flagged_cell, base_rec.move(x * cell_size[0], y * cell_size[1]))
+                screen.blit(cell_assets[cell_info[0]], base_rec.move(x * cell_size[0], y * cell_size[1]))
 
         pointer_group.update()
         pointer_group.draw(screen)
