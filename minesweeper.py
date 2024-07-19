@@ -76,11 +76,18 @@ if __name__ == "__main__":
                 # make sure click was within game board
                 if (board_boundaries[0][0] < pos[0] < board_boundaries[0][1]
                         and board_boundaries[1][0] < pos[1] < board_boundaries[1][1]):
+                    # determine which cell was clicked
                     click_x = floor((pos[0] - display_offset[0]) / cell_size[0])
                     click_y = floor((pos[1] - display_offset[1]) / cell_size[1])
-                    board_layout[click_y][click_x][1] = 2 if cursor.state else 1
 
-
+                    if board_layout[click_y][click_x][1] == 2:
+                        continue  # if cell is already uncovered, do nothing
+                    elif cursor.state:  # cursor is in shovel mode
+                        board_layout[click_y][click_x][1] = 2
+                    elif board_layout[click_y][click_x][1] == 1:  # can assume flag mode
+                        board_layout[click_y][click_x][1] = 0  # if already flagged, reset to normal covered
+                    else:
+                        board_layout[click_y][click_x][1] = 1  # flag cell
 
         # display field
         screen.fill("white")
