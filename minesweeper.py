@@ -2,6 +2,8 @@ import pygame
 from generate_layout import new_layout
 from sprites import Pointer
 from random import seed
+from math import floor
+
 
 seed(10)
 BOARD_SIZE = 15, 15
@@ -13,6 +15,11 @@ if __name__ == "__main__":
     flag_size = (20, 20)
     display_offset = (25, 125)
     screen_size = (BOARD_SIZE[0] * cell_size[0] + display_offset[0] * 2, display_offset[0] + display_offset[1] + BOARD_SIZE[1] * cell_size[1])
+
+    board_boundaries = (
+        (display_offset[0], screen_size[0] - display_offset[0]),
+        (display_offset[1], screen_size[1] - display_offset[0])
+    )
     print("Window Size: %ix%i" % (screen_size[0], screen_size[1]))
 
     # lay new mines
@@ -65,6 +72,15 @@ if __name__ == "__main__":
                 cursor.update_state()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
+
+                # make sure click was within game board
+                if (board_boundaries[0][0] < pos[0] < board_boundaries[0][1]
+                        and board_boundaries[1][0] < pos[1] < board_boundaries[1][1]):
+                    click_x = floor((pos[0] - display_offset[0]) / cell_size[0])
+                    click_y = floor((pos[1] - display_offset[1]) / cell_size[1])
+                    board_layout[click_y][click_x][1] = 2 if cursor.state else 1
+
+
 
         # display field
         screen.fill("white")
