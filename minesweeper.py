@@ -9,6 +9,13 @@ seed(10)
 BOARD_SIZE = 15, 15
 MINE_COUNT = 30
 
+def explore_zeros(field: list, cor: tuple[int, int]):
+    for spos in field[cor[0]][cor[1]][2]:
+        if field[spos[0]][spos[1]][0] == 0 and field[spos[0]][spos[1]][1] != 2:
+            field[spos[0]][spos[1]][1] = 2
+            explore_zeros(field, spos)
+        else: field[spos[0]][spos[1]][1] = 2
+
 if __name__ == "__main__":
 
     cell_size = (30, 30)
@@ -87,7 +94,10 @@ if __name__ == "__main__":
 
                         if board_layout[click_y][click_x][0] == surrounding_flagged:
                             for check_y, check_x in unflagged:
-                                board_layout[check_y][check_x][1] = 2
+                                if board_layout[click_y][click_x][0] == 0:
+                                    board_layout[check_y][check_x][1] = 2
+                                    explore_zeros(board_layout, (click_y, click_x))
+                                else: board_layout[check_y][check_x][1] = 2
 
                     elif cursor.state:  # cursor is in shovel mode
                         board_layout[click_y][click_x][1] = 2
