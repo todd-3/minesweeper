@@ -9,7 +9,15 @@ MINE_COUNT = 30
 screen_size = (500, 600)
 
 if __name__ == "__main__":
-    board_layout = new_layout(*BOARD_SIZE, MINE_COUNT)  # lay new mines
+    # lay new mines
+    # returned board is of a format:
+    #  row (y)
+    #    column (x)
+    #      cell:
+    #        surrounding mine count
+    #        state tracker (0: covered, 1: flagged, 2: uncovered)
+    #        surrounding cell coordinates
+    board_layout: list[list[list[int, int, list[tuple[int, int]]]]] = new_layout(*BOARD_SIZE, MINE_COUNT)
     print(*[' '.join([str(item[0]) for item in row]) for row in board_layout], sep='\n')  # Prints board list - I know it's a mess
 
     # set up window
@@ -57,7 +65,13 @@ if __name__ == "__main__":
         base_rec = pygame.Rect(25, 125, *cell_size)
         for y, row in enumerate(board_layout):
             for x, cell_info in enumerate(row):
-                screen.blit(cell_assets[cell_info[0]], base_rec.move(x * cell_size[0], y * cell_size[1]))
+                if cell_info[1] == 0:
+                    art = cover_cell
+                elif cell_info[1] == 1:
+                    art = flagged_cell
+                else:
+                    art = cell_assets[cell_info[0]]
+                screen.blit(art, base_rec.move(x * cell_size[0], y * cell_size[1]))
 
         pointer_group.update()
         pointer_group.draw(screen)
