@@ -80,14 +80,22 @@ if __name__ == "__main__":
                     click_x = floor((pos[0] - display_offset[0]) / cell_size[0])
                     click_y = floor((pos[1] - display_offset[1]) / cell_size[1])
 
-                    if board_layout[click_y][click_x][1] == 2:
-                        continue  # if cell is already uncovered, do nothing
+                    if board_layout[click_y][click_x][1] == 2:  # if cell is already uncovered
+                        # get a list of all unflagged surrounding cells
+                        unflagged = [(check_y, check_x) for check_y, check_x in board_layout[click_y][click_x][2] if board_layout[check_y][check_x][1] != 1]
+                        surrounding_flagged = 8 - len(unflagged)
+
+                        if board_layout[click_y][click_x][0] == surrounding_flagged:
+                            for check_y, check_x in unflagged:
+                                board_layout[check_y][check_x][1] = 3
+                        continue
+
                     elif cursor.state:  # cursor is in shovel mode
                         board_layout[click_y][click_x][1] = 2
                     elif board_layout[click_y][click_x][1] == 1:  # can assume flag mode
                         board_layout[click_y][click_x][1] = 0  # if already flagged, reset to normal covered
-                    else:
-                        board_layout[click_y][click_x][1] = 1  # flag cell
+                    else:  # flag cell
+                        board_layout[click_y][click_x][1] = 1
 
         # display field
         screen.fill("white")
