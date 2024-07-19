@@ -87,8 +87,7 @@ if __name__ == "__main__":
 
                         if board_layout[click_y][click_x][0] == surrounding_flagged:
                             for check_y, check_x in unflagged:
-                                board_layout[check_y][check_x][1] = 3
-                        continue
+                                board_layout[check_y][check_x][1] = 2
 
                     elif cursor.state:  # cursor is in shovel mode
                         board_layout[click_y][click_x][1] = 2
