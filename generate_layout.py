@@ -2,7 +2,7 @@ from random import randint
 from copy import deepcopy
 
 
-def new_layout(board_width: int, board_height, mine_count: int) -> list[list[tuple[int, list[tuple[int, int]]]]]:
+def new_layout(board_width: int, board_height, mine_count: int) -> list[list[list[int, int, list[tuple[int, int]]]]]:
     # generate base board
     row: list[int] = [0] * board_width
     gameboard: list[list[int]] = []
@@ -10,7 +10,7 @@ def new_layout(board_width: int, board_height, mine_count: int) -> list[list[tup
         gameboard.append(deepcopy(row))
 
     # this is an empty copy of the gameboard that will be used to store output board
-    out_board: list[list[tuple[int, list[tuple[int, int]]]]] = deepcopy(gameboard)
+    out_board: list[list[list[int, int, list[tuple[int, int]]]]] = deepcopy(gameboard)
 
     # gameboard is accessed using board[y][x]
 
@@ -54,5 +54,6 @@ def new_layout(board_width: int, board_height, mine_count: int) -> list[list[tup
             else:
                 surrounded_mines: int = sum([gameboard[checkY][checkX] == 9 for checkY, checkX in surrounding_cells])
 
-            out_board[y][x] = (surrounded_mines, surrounding_cells)
+            # [mine count, state, [surroundings]]
+            out_board[y][x] = [surrounded_mines, 0, surrounding_cells]
     return out_board
