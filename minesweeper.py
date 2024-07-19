@@ -6,9 +6,15 @@ from random import seed
 seed(10)
 BOARD_SIZE = 15, 15
 MINE_COUNT = 30
-screen_size = (500, 600)
 
 if __name__ == "__main__":
+
+    cell_size = (30, 30)
+    flag_size = (20, 20)
+    display_offset = (25, 125)
+    screen_size = (BOARD_SIZE[0] * cell_size[0] + display_offset[0] * 2, display_offset[0] + display_offset[1] + BOARD_SIZE[1] * cell_size[1])
+    print("Window Size: %ix%i" % (screen_size[0], screen_size[1]))
+
     # lay new mines
     # returned board is of a format:
     #  row (y)
@@ -27,18 +33,17 @@ if __name__ == "__main__":
     pygame.display.set_icon(pygame.image.load("assets/window_icon.png").convert())
     pygame.mouse.set_visible(False)
     clock = pygame.time.Clock()
-    cell_size = (30, 30)
-    flag_size = (20, 20)
 
     # load art
+    # TODO - figure out how to .convert() flag and shovel while retaining transparency
     primary_cell_art = ["cell_0.png", "cell_1.png", "cell_2.png", "cell_3.png", "cell_4.png", "cell_5.png", "cell_6.png", "cell_7.png", "cell_8.png", "cell_mine.png"]
     cell_assets = [pygame.image.load("assets/" + file).convert() for file in primary_cell_art]
     flag = pygame.image.load("assets/flag.png")
     shovel = pygame.image.load("assets/shovel.png")
-    cover_cell = pygame.image.load("assets/cell_covered.png")
+    cover_cell = pygame.image.load("assets/cell_covered.png").convert()
 
     # build rest of assets
-    flagged_cell = pygame.image.load("assets/cell_covered.png")
+    flagged_cell = pygame.image.load("assets/cell_covered.png").convert()
     flagged_cell.blit(flag, pygame.Rect(6, 6, *flag_size))
 
     # set pointer class
@@ -58,11 +63,13 @@ if __name__ == "__main__":
                 running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 cursor.update_state()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
 
         # display field
         screen.fill("white")
 
-        base_rec = pygame.Rect(25, 125, *cell_size)
+        base_rec = pygame.Rect(*display_offset, *cell_size)
         for y, row in enumerate(board_layout):
             for x, cell_info in enumerate(row):
                 if cell_info[1] == 0:
