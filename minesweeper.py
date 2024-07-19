@@ -83,7 +83,7 @@ if __name__ == "__main__":
                     if board_layout[click_y][click_x][1] == 2:  # if cell is already uncovered
                         # get a list of all unflagged surrounding cells
                         unflagged = [(check_y, check_x) for check_y, check_x in board_layout[click_y][click_x][2] if board_layout[check_y][check_x][1] != 1]
-                        surrounding_flagged = 8 - len(unflagged)
+                        surrounding_flagged = len(board_layout[click_y][click_x][2]) - len(unflagged)
 
                         if board_layout[click_y][click_x][0] == surrounding_flagged:
                             for check_y, check_x in unflagged:
