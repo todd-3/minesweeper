@@ -71,7 +71,6 @@ if __name__ == "__main__":
     running = True
     while running:
         clock.tick(30)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -98,9 +97,16 @@ if __name__ == "__main__":
                                     board_layout[check_y][check_x][1] = 2
                                     explore_zeros(board_layout, (click_y, click_x))
                                 else: board_layout[check_y][check_x][1] = 2
+                        elif board_layout[click_y][click_x][0] == 9:  # you clicked a mine!!
+                            running = False
+                            print("------ GAME OVER! ------")
 
                     elif cursor.state:  # cursor is in shovel mode
                         board_layout[click_y][click_x][1] = 2
+                        if board_layout[click_y][click_x][0] == 9:  # you clicked a mine!!
+                            running = False
+                        elif board_layout[click_y][click_x][0] == 0:
+                            explore_zeros(board_layout, (click_y, click_x))
                     elif board_layout[click_y][click_x][1] == 1:  # can assume flag mode
                         board_layout[click_y][click_x][1] = 0  # if already flagged, reset to normal covered
                     else:  # flag cell
