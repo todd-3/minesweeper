@@ -2,15 +2,15 @@ from random import randint
 from copy import deepcopy
 
 
-def new_layout(board_width: int, board_height, mine_count: int) -> list[list[int]]:
+def new_layout(board_width: int, board_height, mine_count: int) -> list[list[list[int, int, list[tuple[int, int]]]]]:
     # generate base board
-    row = [0] * board_width
-    gameboard = []
+    row: list[int] = [0] * board_width
+    gameboard: list[list[int]] = []
     for i in range(board_height):
         gameboard.append(deepcopy(row))
 
-    # this is an empty copy of the gameboard that will be used to store additional state information
-    # gameboard_mask = deepcopy(gameboard)
+    # this is an empty copy of the gameboard that will be used to store output board
+    out_board: list[list[list[int, int, list[tuple[int, int]]]]] = deepcopy(gameboard)
 
     # gameboard is accessed using board[y][x]
 
@@ -29,9 +29,6 @@ def new_layout(board_width: int, board_height, mine_count: int) -> list[list[int
     height = board_height - 1
     for y, row in enumerate(gameboard):
         for x, cell in enumerate(row):
-            if cell == 9:  # don't check if cell is a mine
-                continue
-
             if x == 0 and y == 0:  # top left corner
                 surroundings = [(0, 1), (1, 0), (1, 1)]
             elif x == 0 and 0 < y < height:  # left edge
@@ -50,7 +47,13 @@ def new_layout(board_width: int, board_height, mine_count: int) -> list[list[int
                 surroundings = [(0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
             else:
                 surroundings = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-            surrounded_count = sum(gameboard[y + offy][x + offx] == 9 for offy, offx in surroundings)
+            surrounding_cells: list[tuple[int, int]] = [(y + offy, x + offx) for offy, offx in surroundings]
 
-            gameboard[y][x] = surrounded_count
-    return gameboard
+            if cell == 9:  # don't check if cell is a mine
+                surrounded_mines = 9
+            else:
+                surrounded_mines: int = sum([gameboard[checkY][checkX] == 9 for checkY, checkX in surrounding_cells])
+
+            # [mine count, state, [surroundings]]
+            out_board[y][x] = [surrounded_mines, 0, surrounding_cells]
+    return out_board
