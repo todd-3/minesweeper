@@ -12,7 +12,7 @@ MINE_COUNT = 30
 def explore_zeros(field: list, cor: tuple[int, int]):
     for spos in field[cor[0]][cor[1]][2]:
         if field[spos[0]][spos[1]][1] == 1: continue  # if a cell is flagged, don't show it
-        if field[spos[0]][spos[1]][0] == 0 and field[spos[0]][spos[1]][1] != 2:
+        elif field[spos[0]][spos[1]][0] == 0 and field[spos[0]][spos[1]][1] != 2:
             field[spos[0]][spos[1]][1] = 2
             explore_zeros(field, spos)
         else: field[spos[0]][spos[1]][1] = 2
