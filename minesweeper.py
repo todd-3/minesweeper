@@ -8,6 +8,10 @@ from math import floor
 seed(10)
 BOARD_SIZE = 15, 15
 MINE_COUNT = 30
+CELL_SIZE = (30, 30)
+FLAG_SIZE = (20, 20)
+DISPLAY_OFFSET = (25, 125)
+
 
 def explore_zeros(field: list, cor: tuple[int, int]):
     for spos in field[cor[0]][cor[1]][2]:
@@ -17,16 +21,16 @@ def explore_zeros(field: list, cor: tuple[int, int]):
             explore_zeros(field, spos)
         else: field[spos[0]][spos[1]][1] = 2
 
+
 if __name__ == "__main__":
 
-    cell_size = (30, 30)
-    flag_size = (20, 20)
-    display_offset = (25, 125)
-    screen_size = (BOARD_SIZE[0] * cell_size[0] + display_offset[0] * 2, display_offset[0] + display_offset[1] + BOARD_SIZE[1] * cell_size[1])
-
-    bounds = (
-        (display_offset[0], screen_size[0] - display_offset[0]),
-        (display_offset[1], screen_size[1] - display_offset[0])
+    screen_size = (
+        BOARD_SIZE[0] * CELL_SIZE[0] + DISPLAY_OFFSET[0] * 2,
+        DISPLAY_OFFSET[0] + DISPLAY_OFFSET[1] + BOARD_SIZE[1] * CELL_SIZE[1]
+    )
+    bounds = (  # the pixel bounds of the minefield on screen
+        (DISPLAY_OFFSET[0], screen_size[0] - DISPLAY_OFFSET[0]),
+        (DISPLAY_OFFSET[1], screen_size[1] - DISPLAY_OFFSET[0])
     )
     print("Window Size: %ix%i" % (screen_size[0], screen_size[1]))
 
@@ -59,13 +63,13 @@ if __name__ == "__main__":
 
     # build rest of assets
     flagged_cell = pygame.image.load("assets/cell_covered.png").convert()
-    flagged_cell.blit(flag, pygame.Rect(6, 6, *flag_size))
+    flagged_cell.blit(flag, pygame.Rect(6, 6, *FLAG_SIZE))
 
     # set pointer class
     cursor = Pointer(
         shovel_art=shovel,
         flag_art=flag,
-        size=flag_size
+        size=FLAG_SIZE
     )
     pointer_group = pygame.sprite.GroupSingle(cursor)
 
@@ -81,8 +85,8 @@ if __name__ == "__main__":
                 # make sure click was within game board
                 if bounds[0][0] < pos[0] < bounds[0][1] and bounds[1][0] < pos[1] < bounds[1][1]:
                     # determine which cell was clicked
-                    click_x = floor((pos[0] - display_offset[0]) / cell_size[0])
-                    click_y = floor((pos[1] - display_offset[1]) / cell_size[1])
+                    click_x = floor((pos[0] - DISPLAY_OFFSET[0]) / CELL_SIZE[0])
+                    click_y = floor((pos[1] - DISPLAY_OFFSET[1]) / CELL_SIZE[1])
                     clicked_cell = board_layout[click_y][click_x]
 
                     if board_layout[click_y][click_x][1] == 2:  # if cell is already uncovered
@@ -110,7 +114,7 @@ if __name__ == "__main__":
         # display field
         screen.fill("white")
 
-        base_rec = pygame.Rect(*display_offset, *cell_size)
+        base_rec = pygame.Rect(*DISPLAY_OFFSET, *CELL_SIZE)
         for y, row in enumerate(board_layout):
             for x, cell_info in enumerate(row):
                 if cell_info[1] == 0:
@@ -119,7 +123,7 @@ if __name__ == "__main__":
                     art = flagged_cell
                 else:
                     art = cell_assets[cell_info[0]]
-                screen.blit(art, base_rec.move(x * cell_size[0], y * cell_size[1]))
+                screen.blit(art, base_rec.move(x * CELL_SIZE[0], y * CELL_SIZE[1]))
 
         pointer_group.update()
         pointer_group.draw(screen)
