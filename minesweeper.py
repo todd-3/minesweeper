@@ -23,7 +23,7 @@ if __name__ == "__main__":
     display_offset = (25, 125)
     screen_size = (BOARD_SIZE[0] * cell_size[0] + display_offset[0] * 2, display_offset[0] + display_offset[1] + BOARD_SIZE[1] * cell_size[1])
 
-    board_boundaries = (
+    bounds = (
         (display_offset[0], screen_size[0] - display_offset[0]),
         (display_offset[1], screen_size[1] - display_offset[0])
     )
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     cursor = Pointer(
         shovel_art=shovel,
         flag_art=flag,
-        size=(20, 20)
+        size=flag_size
     )
     pointer_group = pygame.sprite.GroupSingle(cursor)
 
@@ -72,45 +72,39 @@ if __name__ == "__main__":
     while running:
         clock.tick(30)
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                cursor.update_state()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.QUIT: running = False
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE: cursor.update_state()
+            elif event.type == pygame.MOUSEBUTTONDOWN:  # player clicked
                 pos = pygame.mouse.get_pos()
 
                 # make sure click was within game board
-                if (board_boundaries[0][0] < pos[0] < board_boundaries[0][1]
-                        and board_boundaries[1][0] < pos[1] < board_boundaries[1][1]):
+                if bounds[0][0] < pos[0] < bounds[0][1] and bounds[1][0] < pos[1] < bounds[1][1]:
                     # determine which cell was clicked
                     click_x = floor((pos[0] - display_offset[0]) / cell_size[0])
                     click_y = floor((pos[1] - display_offset[1]) / cell_size[1])
+                    clicked_cell = board_layout[click_y][click_x]
 
                     if board_layout[click_y][click_x][1] == 2:  # if cell is already uncovered
                         # get a list of all unflagged surrounding cells
-                        unflagged = [(check_y, check_x) for check_y, check_x in board_layout[click_y][click_x][2] if board_layout[check_y][check_x][1] != 1]
+                        unflagged = [(check_y, check_x) for check_y, check_x in clicked_cell[2] if board_layout[check_y][check_x][1] != 1]
                         surrounding_flagged = len(board_layout[click_y][click_x][2]) - len(unflagged)
 
-                        if board_layout[click_y][click_x][0] == surrounding_flagged:
+                        if clicked_cell[0] == surrounding_flagged:
                             for check_y, check_x in unflagged:
-                                if board_layout[click_y][click_x][0] == 0:
+                                if clicked_cell[0] == 0:
                                     board_layout[check_y][check_x][1] = 2
                                     explore_zeros(board_layout, (click_y, click_x))
                                 else: board_layout[check_y][check_x][1] = 2
-                        elif board_layout[click_y][click_x][0] == 9:  # you clicked a mine!!
+                        elif clicked_cell[0] == 9:  # you clicked a mine!!
                             running = False
                             print("------ GAME OVER! ------")
 
                     elif cursor.state:  # cursor is in shovel mode
-                        board_layout[click_y][click_x][1] = 2
-                        if board_layout[click_y][click_x][0] == 9:  # you clicked a mine!!
-                            running = False
-                        elif board_layout[click_y][click_x][0] == 0:
-                            explore_zeros(board_layout, (click_y, click_x))
-                    elif board_layout[click_y][click_x][1] == 1:  # can assume flag mode
-                        board_layout[click_y][click_x][1] = 0  # if already flagged, reset to normal covered
-                    else:  # flag cell
-                        board_layout[click_y][click_x][1] = 1
+                        clicked_cell[1] = 2
+                        if clicked_cell[0] == 9: running = False  # you clicked a mine!!
+                        elif clicked_cell[0] == 0: explore_zeros(board_layout, (click_y, click_x))  # if empty cell, expose all other surrounding 0s
+                    elif clicked_cell[1] == 1: clicked_cell[1] = 0  # can assume flag mode, if already flagged, reset to normal covered
+                    else: clicked_cell[1] = 1  # flag cell
 
         # display field
         screen.fill("white")
