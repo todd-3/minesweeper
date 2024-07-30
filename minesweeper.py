@@ -74,7 +74,9 @@ if __name__ == "__main__":
     pointer_group = pygame.sprite.GroupSingle(cursor)
 
     running = True
-    while running:
+    game_state = 0
+    flags_placed = 0
+    while running and not game_state:
         clock.tick(30)
         for event in pygame.event.get():
             if event.type == pygame.QUIT: running = False
@@ -100,16 +102,20 @@ if __name__ == "__main__":
                                     board_layout[check_y][check_x][1] = 2
                                     explore_zeros(board_layout, (click_y, click_x))
                                 else: board_layout[check_y][check_x][1] = 2
-                        elif clicked_cell[0] == 9:  # you clicked a mine!!
-                            running = False
-                            print("------ GAME OVER! ------")
+                        elif clicked_cell[0] == 9: game_state = 1  # you clicked a mine!!
 
                     elif cursor.state:  # cursor is in shovel mode
                         clicked_cell[1] = 2
-                        if clicked_cell[0] == 9: running = False  # you clicked a mine!!
+                        if clicked_cell[0] == 9: game_state = 1  # you clicked a mine!!
                         elif clicked_cell[0] == 0: explore_zeros(board_layout, (click_y, click_x))  # if empty cell, expose all other surrounding 0s
-                    elif clicked_cell[1] == 1: clicked_cell[1] = 0  # can assume flag mode, if already flagged, reset to normal covered
-                    else: clicked_cell[1] = 1  # flag cell
+
+                    # can assume the cursor is in flag mode beyond this point
+                    elif clicked_cell[1] == 1:  # if already flagged, reset to normal covered
+                        clicked_cell[1] = 0
+                        flags_placed -= 1
+                    else:  # flag cell
+                        clicked_cell[1] = 1
+                        flags_placed += 1
 
         # display field
         screen.fill("white")
@@ -129,5 +135,9 @@ if __name__ == "__main__":
         pointer_group.draw(screen)
 
         pygame.display.flip()
+
+    if running:
+        if game_state == 1:
+            print("You hit a mine!\n------ GAME OVER! ------")
 
     pygame.quit()
