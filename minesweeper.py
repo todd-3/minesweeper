@@ -3,6 +3,7 @@ from generate_layout import new_layout
 from sprites import Pointer
 from random import seed
 from math import floor
+import assets
 
 
 seed(10)
@@ -49,21 +50,18 @@ if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode(screen_size)
     pygame.display.set_caption("MINESWEEPER")
-    pygame.display.set_icon(pygame.image.load("assets/window_icon.png").convert())
+    pygame.display.set_icon(pygame.image.load(assets.assets[2]).convert())
     pygame.mouse.set_visible(False)
     clock = pygame.time.Clock()
 
     # load art
     # TODO - figure out how to .convert() flag and shovel while retaining transparency
-    primary_cell_art = ["cell_0.png", "cell_1.png", "cell_2.png", "cell_3.png", "cell_4.png", "cell_5.png", "cell_6.png", "cell_7.png", "cell_8.png", "cell_mine.png"]
-    cell_assets = [pygame.image.load("assets/" + file).convert() for file in primary_cell_art]
-    flag = pygame.image.load("assets/flag.png")
-    shovel = pygame.image.load("assets/shovel.png")
-    cover_cell = pygame.image.load("assets/cell_covered.png").convert()
+    cell_assets = [pygame.image.load(file).convert() for file in assets.cells]
+    flag = pygame.image.load(assets.assets[0])
+    shovel = pygame.image.load(assets.assets[1])
 
-    # build rest of assets
-    flagged_cell = pygame.image.load("assets/cell_covered.png").convert()
-    flagged_cell.blit(flag, pygame.Rect(6, 6, *FLAG_SIZE))
+    cell_assets.append(pygame.image.load(assets.cells[10]).convert())  # duplicate covered cell into art list
+    cell_assets[11].blit(flag, pygame.Rect(6, 6, *FLAG_SIZE))  # blit flag onto duplicated cover
 
     # set pointer class
     cursor = Pointer(
@@ -96,6 +94,8 @@ if __name__ == "__main__":
                         unflagged = [(check_y, check_x) for check_y, check_x in clicked_cell[2] if board_layout[check_y][check_x][1] != 1]
                         surrounding_flagged = len(board_layout[click_y][click_x][2]) - len(unflagged)
 
+                        # check if the number of surrounding cells flag is equivalent to the cell's mine count
+                        # if it is, uncover all unflagged surrounding cells
                         if clicked_cell[0] == surrounding_flagged:
                             for check_y, check_x in unflagged:
                                 if clicked_cell[0] == 0:
@@ -124,9 +124,9 @@ if __name__ == "__main__":
         for y, row in enumerate(board_layout):
             for x, cell_info in enumerate(row):
                 if cell_info[1] == 0:
-                    art = cover_cell
+                    art = cell_assets[10]
                 elif cell_info[1] == 1:
-                    art = flagged_cell
+                    art = cell_assets[11]
                 else:
                     art = cell_assets[cell_info[0]]
                 screen.blit(art, base_rec.move(x * CELL_SIZE[0], y * CELL_SIZE[1]))
