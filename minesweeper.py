@@ -11,7 +11,8 @@ BOARD_SIZE = 15, 15
 MINE_COUNT = 30
 CELL_SIZE = (30, 30)
 FLAG_SIZE = (20, 20)
-DISPLAY_OFFSET = (25, 125)
+COUNTER_SIZE = (45, 80)
+PADDING = 25
 
 
 def explore_zeros(field: list, cor: tuple[int, int]):
@@ -26,14 +27,22 @@ def explore_zeros(field: list, cor: tuple[int, int]):
 if __name__ == "__main__":
 
     screen_size = (
-        BOARD_SIZE[0] * CELL_SIZE[0] + DISPLAY_OFFSET[0] * 2,
-        DISPLAY_OFFSET[0] + DISPLAY_OFFSET[1] + BOARD_SIZE[1] * CELL_SIZE[1]
+        BOARD_SIZE[0] * CELL_SIZE[0] + PADDING * 2,
+        BOARD_SIZE[1] * CELL_SIZE[1] + PADDING * 3 + COUNTER_SIZE[1]
     )
     bounds = (  # the pixel bounds of the minefield on screen
-        (DISPLAY_OFFSET[0], screen_size[0] - DISPLAY_OFFSET[0]),
-        (DISPLAY_OFFSET[1], screen_size[1] - DISPLAY_OFFSET[0])
+        (PADDING, screen_size[0] - PADDING),
+        (PADDING * 2 + COUNTER_SIZE[1], screen_size[1] - PADDING)
     )
     print("Window Size: %ix%i" % (screen_size[0], screen_size[1]))
+
+    score_places = len(str(MINE_COUNT))  # number of 7-segment entities that will be needed to count score
+    score_offset = floor((screen_size[0] - COUNTER_SIZE[0] * score_places) / 2)  # left edge of left-most scoring segment
+    # score_placement = [  # (x, y) position of each score segment
+    #     (score_offset + COUNTER_SIZE[0] * i, PADDING) for i in range(score_places)
+    # ]
+
+    top_left_corner = (PADDING, PADDING * 2 + COUNTER_SIZE[1])
 
     # lay new mines
     # returned board is of a format:
@@ -42,7 +51,7 @@ if __name__ == "__main__":
     #      cell:
     #        surrounding mine count
     #        state tracker (0: covered, 1: flagged, 2: uncovered)
-    #        surrounding cell coordinates
+    #        surrounding cell coordinates (list)
     board_layout: list[list[list[int, int, list[tuple[int, int]]]]] = new_layout(*BOARD_SIZE, MINE_COUNT)
     print(*[' '.join([str(item[0]) for item in row]) for row in board_layout], sep='\n')  # Prints board list - I know it's a mess
 
@@ -57,6 +66,7 @@ if __name__ == "__main__":
     # load art
     # TODO - figure out how to .convert() flag and shovel while retaining transparency
     cell_assets = [pygame.image.load(file).convert() for file in assets.cells]
+    score_segments = [pygame.image.load(file).convert() for file in assets.score_display]
     flag = pygame.image.load(assets.assets[0])
     shovel = pygame.image.load(assets.assets[1])
 
@@ -89,8 +99,8 @@ if __name__ == "__main__":
                 # make sure click was within game board
                 if bounds[0][0] < pos[0] < bounds[0][1] and bounds[1][0] < pos[1] < bounds[1][1]:
                     # determine which cell was clicked
-                    click_x = floor((pos[0] - DISPLAY_OFFSET[0]) / CELL_SIZE[0])
-                    click_y = floor((pos[1] - DISPLAY_OFFSET[1]) / CELL_SIZE[1])
+                    click_x = floor((pos[0] - PADDING) / CELL_SIZE[0])
+                    click_y = floor((pos[1] - top_left_corner[1]) / CELL_SIZE[1])
                     clicked_cell = board_layout[click_y][click_x]
 
                     if board_layout[click_y][click_x][1] == 2:  # if cell is already uncovered
@@ -124,8 +134,13 @@ if __name__ == "__main__":
         # display field
         screen.fill("white")
 
+        score_rec = pygame.Rect(score_offset, PADDING, *COUNTER_SIZE)
+        segment_numbers = [int(i) for i in str(flags_placed).zfill(score_places)]
+        for i in range(score_places):
+            screen.blit(score_segments[segment_numbers[i]], score_rec.move(COUNTER_SIZE[0] * i, 0))
+
         cells_opened = 0
-        base_rec = pygame.Rect(*DISPLAY_OFFSET, *CELL_SIZE)
+        base_rec = pygame.Rect(*top_left_corner, *CELL_SIZE)
         for y, row in enumerate(board_layout):
             for x, cell_info in enumerate(row):
                 if cell_info[1] == 0:
