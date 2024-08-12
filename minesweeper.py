@@ -73,7 +73,11 @@ if __name__ == "__main__":
 
     running = True
     game_state = 0
+
+    # if flags_placed + cells_opened = board_size * board_height, game is won
     flags_placed = 0
+    total_cells = BOARD_SIZE[0] * BOARD_SIZE[1]
+
     while running and not game_state:
         clock.tick(30)
         for event in pygame.event.get():
@@ -120,6 +124,7 @@ if __name__ == "__main__":
         # display field
         screen.fill("white")
 
+        cells_opened = 0
         base_rec = pygame.Rect(*DISPLAY_OFFSET, *CELL_SIZE)
         for y, row in enumerate(board_layout):
             for x, cell_info in enumerate(row):
@@ -129,7 +134,10 @@ if __name__ == "__main__":
                     art = cell_assets[11]
                 else:
                     art = cell_assets[cell_info[0]]
+                    cells_opened += 1
                 screen.blit(art, base_rec.move(x * CELL_SIZE[0], y * CELL_SIZE[1]))
+
+        if flags_placed == MINE_COUNT and cells_opened + flags_placed == total_cells: game_state = 2  # you won!
 
         pointer_group.update()
         pointer_group.draw(screen)
@@ -139,5 +147,7 @@ if __name__ == "__main__":
     if running:
         if game_state == 1:
             print("You hit a mine!\n------ GAME OVER! ------")
+        if game_state == 2:
+            print("You win!")
 
     pygame.quit()
