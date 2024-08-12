@@ -9,3 +9,9 @@ cells = [
 
 assets = ["assets/flag.png", "assets/shovel.png", "assets/window_icon.png"]
 
+score_display = [
+    "assets/segment_0.png", "assets/segment_1.png", "assets/segment_2.png",
+    "assets/segment_3.png", "assets/segment_4.png", "assets/segment_5.png",
+    "assets/segment_6.png", "assets/segment_7.png", "assets/segment_8.png",
+    "assets/segment_9.png", "assets/segment_null.png"
+]
